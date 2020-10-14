@@ -144,6 +144,13 @@ android {
         }
     }
     signingConfigs {
+        release {
+            storeFile file('airanddriverapp.keystore')
+            storePassword 'Admin@123'
+            keyAlias 'airanddriverapp'
+            keyPassword 'Admin@123'
+        }
+        
         debug {
             storeFile file('airanddriverapp.keystore')
             storePassword 'Admin@123'
