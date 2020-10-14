@@ -33,7 +33,7 @@ class OrderTile extends Component {
     render() {
         let dropDown;
         if (this.state.isPressed) {
-            //if (this.state.tabType === 'pending' || this.state.tabType === 'inProgress') {
+            if (this.props.tabType === 'pending' || this.props.tabType === 'inProgress') {
             dropDown =
                 <View >
                     <View style={{ paddingHorizontal: 40, paddingTop: 20 }}>
@@ -94,7 +94,7 @@ class OrderTile extends Component {
                         </View>
                     </View>
                 </View>
-            //}
+            }
         }
         return (
             <View style={this.props.style}>
