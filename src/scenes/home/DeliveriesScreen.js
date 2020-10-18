@@ -1,6 +1,6 @@
 
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler } from 'react-native';
 import OrderTile from '../../components/OrderTile';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 
@@ -129,6 +129,8 @@ export default class DeliveriesScreen extends Component {
 
         // you can also just start without checking for status
         // BackgroundGeolocation.start();
+
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
 
     sendLocation(location) {
@@ -172,6 +174,10 @@ export default class DeliveriesScreen extends Component {
                 orderList: [""]
             })
         }
+    }
+
+    handleBackButton() {
+        BackHandler.exitApp();
     }
 
     render() {

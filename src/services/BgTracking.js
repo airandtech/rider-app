@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Alert, Text, View } from 'react-native';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import { CommonActions } from '@react-navigation/native';
 
 class BgTracking extends Component {
     componentDidMount() {
@@ -110,8 +111,14 @@ class BgTracking extends Component {
 
 
         setTimeout(() => {
-            this.props.navigation.navigate('IncomingOrder');
-        }, 15000);
+               this.props.navigation.dispatch(
+                CommonActions.reset({
+                 index: 0,
+                 routes: [{ name: 'AppHome' }],
+                })
+               );
+            // this.props.navigation.navigate('AppHome');
+        }, 5000);
     }
 
     sendLocation(location) {

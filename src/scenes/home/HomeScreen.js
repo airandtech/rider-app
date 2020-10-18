@@ -1,15 +1,24 @@
 
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, BackHandler } from 'react-native';
 
-export default function HomeScreen({ navigation }) {
+export default class HomeScreen extends Component {
 
+    componentDidMount(){
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
 
+    handleBackButton() {
+        BackHandler.exitApp();
+    }
+    
+    render(){
     return (
         <View style={styles.container}>
             <Text>Home</Text>
         </View>
     );
+    }
 }
 
 const styles = StyleSheet.create({
