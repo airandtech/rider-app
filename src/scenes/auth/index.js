@@ -19,6 +19,7 @@ export default class VerificationScreen extends Component {
             return
         }
         this.setState({ loading: true })
+        console.warn(`url: ${baseUrl()}users/check-phone/${this.state.phone}`)
         fetch(baseUrl() + 'users/check-phone/' + this.state.phone, {
             method: 'get',
             headers: {
@@ -28,6 +29,9 @@ export default class VerificationScreen extends Component {
             .then(res => {
                 if (res.statusCode === 200 && res.data.status) {
                     this.props.navigation.navigate('OTP', {phone: this.state.phone})
+                }else if(res.statusCode === 500){
+                    this.setState({ loading: false })
+                    showTopNotification("danger", 'Oops!!! Something went wrong')
                 } else {
                     this.setState({ loading: false })
                     showTopNotification("danger", res.data.message)

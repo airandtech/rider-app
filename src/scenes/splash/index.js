@@ -13,6 +13,7 @@ export default class SplashScreen extends Component {
     }
 
     initPage = () => {
+        // (async () => {  await AsyncStorage.setItem('@isAuthenticated', 'true')  })();
         AsyncStorage.getItem('@isAuthenticated').then((value) => {
             console.warn(value);
             if (value === 'true') {

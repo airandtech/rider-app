@@ -2,8 +2,19 @@ import React, { Component } from 'react';
 import { Alert, Text, View } from 'react-native';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import { CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
+import { baseUrl, processResponse, showTopNotification, token } from '../utilities';
+import messaging from '@react-native-firebase/messaging';
 
 class BgTracking extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            token: ""
+        };
+    }
+
     componentDidMount() {
         BackgroundGeolocation.configure({
             desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
@@ -21,7 +32,7 @@ class BgTracking extends Component {
             stopOnStillActivity: false,
             url: 'https://airandapi.azurewebsites.net/api/location/driver/update',
             httpHeaders: {
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQiLCJuYmYiOjE2MDI3MTMwMTIsImV4cCI6MTgyMzU1MTQxMiwiaWF0IjoxNjAyNzEzMDEyfQ.ihgESuAXOt-U67P6bqtb9HMAV79fVaoCWW8iXahg67w'
+                'Authorization': token()
             },
             // customize post properties
             postTemplate: {
@@ -34,7 +45,7 @@ class BgTracking extends Component {
             // handle your locations here
             // to perform long running operation on iOS
             // you need to create background task
-            
+
             BackgroundGeolocation.startTask(taskKey => {
                 console.warn(`latitude: ${location.latitude}, longitude: ${location.longitude}`)
                 this.sendLocation(location)
@@ -109,23 +120,117 @@ class BgTracking extends Component {
         // you can also just start without checking for status
         // BackgroundGeolocation.start();
 
+        this.checkPermission();
 
-        setTimeout(() => {
-               this.props.navigation.dispatch(
-                CommonActions.reset({
-                 index: 0,
-                 routes: [{ name: 'AppHome' }],
-                })
-               );
-            // this.props.navigation.navigate('AppHome');
-        }, 5000);
+        this.createNotificationListeners();
+
+        // setTimeout(() => {
+        //     this.props.navigation.dispatch(
+        //         CommonActions.reset({
+        //             index: 0,
+        //             routes: [{ name: 'AppHome' }],
+        //         })
+        //     );
+        //     // this.props.navigation.navigate('AppHome');
+        // }, 5000);
+
+    }
+
+    async requestPermission() {
+        const authorizationStatus = await messaging().requestPermission();
+        console.warn(`==> authorizationStatus: ${authorizationStatus}`)
+        if (authorizationStatus) {
+            console.warn('Permission status:', authorizationStatus);
+            if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+                console.warn('User has notification permissions enabled.');
+                this.getToken();
+            } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+                console.warn('User has provisional notification permissions.');
+            } else {
+                console.warn('User has notification permissions disabled');
+            }
+        } else {
+            console.warn('permission rejected');
+        }
+    }
+
+    async checkPermission() {
+       
+        const enabled = await messaging().hasPermission();
+        console.warn(`checkPermission: ${enabled}`)
+        // If Premission granted proceed towards token fetch
+        if (enabled) {
+            console.warn(`==> about to get token`)
+            this.getToken();
+        } else {
+            console.warn(`==> requesting permission`)
+            // If permission hasn’t been granted to our app, request user in requestPermission method. 
+            this.requestPermission();
+        }
+    }
+
+    async getToken() {
+        let fcmToken = await AsyncStorage.getItem('fcmToken');
+        console.warn(`==> getting token`)
+        if (!fcmToken) {
+            console.warn(`==> fcmToken is not available`)
+            // Register the device with FCM
+            await messaging().registerDeviceForRemoteMessages();
+
+            // Get the token
+            const token = await messaging().getToken();
+            console.warn(`==> getToken returned: ${token}`)
+            if (token) {
+                // user has a device token
+                await AsyncStorage.setItem('fcmToken', token);
+                await this._saveDeviceToken(token);
+            }
+
+            // Save the token
+            await _saveDeviceToken(token);
+        }
+        console.warn(`==> fcmToken is available`)
+    }
+
+    async _saveDeviceToken(fcmToken) {
+        console.warn(`===> users/save-token/${fcmToken}`)
+        fetch(baseUrl() + 'users/save-token/' + fcmToken, {
+            method: 'get',
+            headers: {
+                'Content-Type': "application/json",
+                'Authorization': token()
+            },
+        }).then(processResponse)
+            .then(res => {
+                if (res.statusCode === 200 && res.data.status) {
+                    showTopNotification("success", "Token Saved")
+                } else {
+                    this.setState({ loading: false })
+                    showTopNotification("danger", res.data.message)
+                }
+            })
+            .catch((error) => {
+                this.setState({ loading: false })
+                showTopNotification("danger", error.message)
+            });
+    }
+
+    async createNotificationListeners() {
+        messaging().onMessage(this.onMessageReceived);
+        messaging().setBackgroundMessageHandler(this.onMessageReceived);
+    }
+
+    onMessageReceived(message) {
+        
+        console.warn(`time:: ${message.sentTime}`)
+        console.warn(`data:: ${JSON.stringify(message.data)}`)
     }
 
     sendLocation(location) {
         fetch('https://airandapi.azurewebsites.net/api/location/driver/update', {
             method: 'post',
             headers: {
-                "Authorization": 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQiLCJuYmYiOjE2MDI3MTMwMTIsImV4cCI6MTgyMzU1MTQxMiwiaWF0IjoxNjAyNzEzMDEyfQ.ihgESuAXOt-U67P6bqtb9HMAV79fVaoCWW8iXahg67w',
+                "Authorization": token(),
                 'Content-Type': "application/json"
             },
             body: JSON.stringify({ 'latitude': location.latitude, 'longitude': location.longitude })

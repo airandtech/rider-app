@@ -3,6 +3,7 @@ import React, { Component, useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler } from 'react-native';
 import OrderTile from '../../components/OrderTile';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
+import { token } from '../../utilities';
 
 export default class DeliveriesScreen extends Component {
     constructor(props) {
@@ -42,7 +43,7 @@ export default class DeliveriesScreen extends Component {
             stopOnStillActivity: false,
             url: 'https://airandapi.azurewebsites.net/api/location/driver/update',
             httpHeaders: {
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQiLCJuYmYiOjE2MDI3MTMwMTIsImV4cCI6MTgyMzU1MTQxMiwiaWF0IjoxNjAyNzEzMDEyfQ.ihgESuAXOt-U67P6bqtb9HMAV79fVaoCWW8iXahg67w'
+                'Authorization': token()
             },
             // customize post properties
             postTemplate: {
@@ -123,7 +124,7 @@ export default class DeliveriesScreen extends Component {
 
             // you don't need to check status before start (this is just the example)
             if (!status.isRunning) {
-                BackgroundGeolocation.start(); //triggers start on start event
+               BackgroundGeolocation.start(); //triggers start on start event
             }
         });
 
@@ -137,7 +138,7 @@ export default class DeliveriesScreen extends Component {
         fetch('https://airandapi.azurewebsites.net/api/location/driver/update', {
             method: 'post',
             headers: {
-                "Authorization": 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQiLCJuYmYiOjE2MDI3MTMwMTIsImV4cCI6MTgyMzU1MTQxMiwiaWF0IjoxNjAyNzEzMDEyfQ.ihgESuAXOt-U67P6bqtb9HMAV79fVaoCWW8iXahg67w',
+                "Authorization": token(),
                 'Content-Type': "application/json"
             },
             body: JSON.stringify({ 'latitude': location.latitude, 'longitude': location.longitude })
@@ -150,7 +151,7 @@ export default class DeliveriesScreen extends Component {
 
     componentWillUnmount() {
         // unregister all event listeners
-        BackgroundGeolocation.removeAllListeners();
+        // BackgroundGeolocation.removeAllListeners();
     }
 
     _handleTabClick(type) {

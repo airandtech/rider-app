@@ -9,15 +9,18 @@ export const baseUrl = () => {
   return 'https://airandapi.azurewebsites.net/';
 };
 
-export const showTopNotification = (type, message)=> {
-    showMessage({
-      message: message,
-      type: type,
-      duration: 5000,
-      icon: type,
-      position: "top"
-    });
-  }
+export const token = () => {
+  return 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQiLCJuYmYiOjE2MDMwNjMyMjgsImV4cCI6MTgyMzkwMTYyOCwiaWF0IjoxNjAzMDYzMjI4fQ.9qrRM-7ootxzJzP5GLynGCXwT01n95ZYHrD6_dXGjAw'
+};
+export const showTopNotification = (type, message) => {
+  showMessage({
+    message: message,
+    type: type,
+    duration: 5000,
+    icon: type,
+    position: "top"
+  });
+}
 
 // export const storeToken = async (selectedValue, email) => {
 //   try {
@@ -44,7 +47,8 @@ export const removeToken = async (selectedValue, email) => {
   }
 }
 
-export const processResponse = (response) =>  {
+export const processResponse = (response) => {
+  console.warn(`RESP:: ${response.status}`)
   const statusCode = response.status;
   const data = response.json();
   return Promise.all([statusCode, data]).then(res => ({

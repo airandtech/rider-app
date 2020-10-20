@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "521050915806",
+    "firebase_url": "https://nujtest-1490355381509.firebaseio.com",
+    "project_id": "nujtest-1490355381509",
+    "storage_bucket": "nujtest-1490355381509.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521050915806:android:7be8c760fea58b6a6b934f",
+        "android_client_info": {
+          "package_name": "com.airandriderapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521050915806-a5d5bnmm76t3jqcpvc4cn61iu39ir0ci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaiOcZz4JBfHctguzxOcmaxjj6_mShqf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521050915806-a5d5bnmm76t3jqcpvc4cn61iu39ir0ci.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "521050915806-gp2gsadrhkrugjb50hkj5v4rmr1hq26l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.timolor.Move"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521050915806:android:2e64bbcc6b37dcee6b934f",
+        "android_client_info": {
+          "package_name": "com.rnpushnotification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521050915806-a5d5bnmm76t3jqcpvc4cn61iu39ir0ci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaiOcZz4JBfHctguzxOcmaxjj6_mShqf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521050915806-a5d5bnmm76t3jqcpvc4cn61iu39ir0ci.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "521050915806-gp2gsadrhkrugjb50hkj5v4rmr1hq26l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.timolor.Move"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
