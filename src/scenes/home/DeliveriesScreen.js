@@ -1,9 +1,11 @@
 
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler, Alert } from 'react-native';
 import OrderTile from '../../components/OrderTile';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
-import { token } from '../../utilities';
+import AsyncStorage from '@react-native-community/async-storage';
+import { baseUrl, processResponse, showTopNotification, token } from '../../utilities';
+import messaging from '@react-native-firebase/messaging';
 
 export default class DeliveriesScreen extends Component {
     constructor(props) {
@@ -13,7 +15,7 @@ export default class DeliveriesScreen extends Component {
             completedOrders: [
                 "", "",
             ],
-            ordersInPorgress: [
+            ordersInProgress: [
                 "", "", ""
             ],
             pendingOrders: [
@@ -22,8 +24,18 @@ export default class DeliveriesScreen extends Component {
             orderList: [],
             completed: { borderBottomColor: 'red' },
             inProgress: { borderBottomColor: 'transparent' },
-            pending: { borderBottomColor: 'transparent' }
-        }
+            pending: { borderBottomColor: 'transparent' },
+            // navigation:  props.navigation.navigate('IncomingOrderX', {requestorEmail: "state.requestorEmail"}),
+            requestorEmail: "",
+            doNavigate: true
+            
+        };
+        this.change = this.change.bind(this)
+        // this.onMessageReceived.bind(this)
+    }
+
+    change(message) {
+        this.props.navigation.navigate('IncomingOrderX', {requestorEmail: message})
     }
 
     componentDidMount() {
@@ -131,7 +143,94 @@ export default class DeliveriesScreen extends Component {
         // you can also just start without checking for status
         // BackgroundGeolocation.start();
 
+
+        this.checkPermission();
+
+        this.createNotificationListeners();
+
+        // this.onMessageReceived("here")
+
+
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    async requestPermission() {
+        const authorizationStatus = await messaging().requestPermission();
+        console.warn(`==> authorizationStatus: ${authorizationStatus}`)
+        if (authorizationStatus) {
+            console.warn('Permission status:', authorizationStatus);
+            if (authorizationStatus === messaging.AuthorizationStatus.AUTHORIZED) {
+                console.warn('User has notification permissions enabled.');
+                this.getToken();
+            } else if (authorizationStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+                console.warn('User has provisional notification permissions.');
+            } else {
+                console.warn('User has notification permissions disabled');
+            }
+        } else {
+            console.warn('permission rejected');
+        }
+    }
+
+    async checkPermission() {
+       
+        const enabled = await messaging().hasPermission();
+        console.warn(`checkPermission: ${enabled}`)
+        // If Premission granted proceed towards token fetch
+        if (enabled) {
+            console.warn(`==> about to get token`)
+            this.getToken();
+        } else {
+            console.warn(`==> requesting permission`)
+            // If permission hasn’t been granted to our app, request user in requestPermission method. 
+            this.requestPermission();
+        }
+    }
+
+    async getToken() {
+        let fcmToken = await AsyncStorage.getItem('fcmToken');
+        console.warn(`==> getting token`)
+        if (!fcmToken) {
+            console.warn(`==> fcmToken is not available`)
+            // Register the device with FCM
+            await messaging().registerDeviceForRemoteMessages();
+
+            // Get the token
+            const token = await messaging().getToken();
+            console.warn(`==> getToken returned: ${token}`)
+            if (token) {
+                // user has a device token
+                await AsyncStorage.setItem('fcmToken', token);
+                await this._saveDeviceToken(token);
+            }
+
+            // Save the token
+            await _saveDeviceToken(token);
+        }
+        console.warn(`==> fcmToken is available`)
+    }
+
+    async _saveDeviceToken(fcmToken) {
+        console.warn(`===> users/save-token/${fcmToken}`)
+        fetch(baseUrl() + 'users/save-token/' + fcmToken, {
+            method: 'get',
+            headers: {
+                'Content-Type': "application/json",
+                'Authorization': token()
+            },
+        }).then(processResponse)
+            .then(res => {
+                if (res.statusCode === 200 && res.data.status) {
+                    showTopNotification("success", "Token Saved")
+                } else {
+                    this.setState({ loading: false })
+                    showTopNotification("danger", res.data.message)
+                }
+            })
+            .catch((error) => {
+                this.setState({ loading: false })
+                showTopNotification("danger", error.message)
+            });
     }
 
     sendLocation(location) {
@@ -181,6 +280,18 @@ export default class DeliveriesScreen extends Component {
         BackHandler.exitApp();
     }
 
+    async createNotificationListeners() {
+        messaging().onMessage(this.onMessageReceived);
+        //.bind(this);
+        messaging().setBackgroundMessageHandler(this.onMessageReceived);
+    }
+
+    
+
+    onMessageReceived = (message) => {
+        this.props.navigation.navigate('IncomingOrderX', {data: message.data})
+    }
+
     render() {
         let body
         if (this.state.tab === 'completed') {
@@ -203,7 +314,7 @@ export default class DeliveriesScreen extends Component {
             body = <View>
                 <FlatList
                     style={{ paddingBottom: 5 }}
-                    data={this.state.ordersInPorgress}
+                    data={this.state.ordersInProgress}
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>

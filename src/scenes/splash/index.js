@@ -17,7 +17,7 @@ export default class SplashScreen extends Component {
         AsyncStorage.getItem('@isAuthenticated').then((value) => {
             console.warn(value);
             if (value === 'true') {
-                this.props.navigation.navigate('App');
+                this.props.navigation.navigate('AppStack');
             } else {
                 this.props.navigation.navigate('Auth');
             }
