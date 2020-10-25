@@ -61,7 +61,7 @@ export default class IncomingRequestScreen extends Component {
                 <View style={styles.bottomLayer}>
                     <View>
                         <View style={{ flexDirection: 'row', marginBottom: 25 }}>
-                            <Text style={[styles.bottomText, { marginRight: 50 }]}>3 min</Text>
+                            <Text style={[styles.bottomText, { marginRight: 50 }]}>{this.state.data.time}</Text>
                             <Text style={styles.bottomText}>{this.state.data.distance}</Text>
                         </View>
                         <Text style={[styles.bottomText, { fontSize: 23 }]}>

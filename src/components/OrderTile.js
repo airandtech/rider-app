@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { SafeAreaView, StyleSheet, Text, Image, View, Dimensions, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
+import { formatDate } from "../utilities";
 
 
 class OrderTile extends Component {
@@ -38,10 +39,10 @@ class OrderTile extends Component {
                 <View >
                     <View style={{ paddingHorizontal: 40, paddingTop: 20 }}>
                         <Text style={styles.ddTitle}>Sender's name</Text>
-                        <Text style={styles.ddValue}>Ginika</Text>
+                        <Text style={styles.ddValue}>{this.props.dataItem.pickUp.name}</Text>
                         <Text style={styles.ddTitle}>Sender's phone number</Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={styles.ddValue}>+234 708 525 4825</Text>
+                            <Text style={styles.ddValue}>{this.props.dataItem.pickUp.phone}</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Icon
                                     active
@@ -54,16 +55,16 @@ class OrderTile extends Component {
                             </View>
                         </View>
                         <Text style={styles.ddTitle}>Pickup address</Text>
-                        <Text style={styles.ddValue}>18 Rumens road, Ikoyi, Lagos</Text>
+                        <Text style={styles.ddValue}>{this.props.dataItem.pickUp.address}</Text>
                         <Text style={styles.ddTitle}>Description</Text>
-                        <Text style={styles.ddValue}>Clothing</Text>
+                        <Text style={styles.ddValue}>{this.props.dataItem.delivery.description}</Text>
                     </View>
                     <View style={{ paddingHorizontal: 40, paddingTop: 10 }}>
                         <Text style={styles.ddTitle}>Receiver's name</Text>
-                        <Text style={styles.ddValue}>Ginika</Text>
+                        <Text style={styles.ddValue}>{this.props.dataItem.delivery.name}</Text>
                         <Text style={styles.ddTitle}>Receiver's phone number</Text>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={styles.ddValue}>+234 708 525 4825</Text>
+                            <Text style={styles.ddValue}>{this.props.dataItem.delivery.phone}</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <Icon
                                     active
@@ -76,7 +77,7 @@ class OrderTile extends Component {
                             </View>
                         </View>
                         <Text style={styles.ddTitle}>Delivery address</Text>
-                        <Text style={styles.ddValue}>3 Morinre Johnson, Lekki Phase 1, Lagos</Text>
+                        <Text style={styles.ddValue}>{this.props.dataItem.delivery.address}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', paddingVertical: 30, paddingHorizontal: 40, backgroundColor: '#0ED91B', marginTop: 10, justifyContent: 'space-between', alignItems: 'center', marginBottom: 40 }}>
                         <View style={{ flexDirection: 'row' }}>
@@ -100,7 +101,7 @@ class OrderTile extends Component {
             <View style={this.props.style}>
                 <View style={styles.cardContainer}>
                     <TouchableOpacity style={{ paddingHorizontal: 10 }} onPress={() => { this.setState({ isPressed: !this.state.isPressed }); this._handleTabClicked() }}>
-                        <Text style={{ fontWeight: "bold", fontSize: 18, marginLeft: 25 }}>Order #</Text>
+                        <Text style={{ fontWeight: "bold", fontSize: 18, marginLeft: 25 }}>Order {this.props.dataItem.id}</Text>
                         <View style={styles.orderTab}>
                             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                                 <Icon
@@ -115,16 +116,16 @@ class OrderTile extends Component {
 
                             </View>
                             <View style={{ flex: 3, }}>
-                                <Text style={{ color: '#F72514', }}>Festac Town, Lagos</Text>
+                                <Text style={{ color: '#F72514', }}>{this.props.dataItem.pickUp.address}</Text>
                                 <Text>to</Text>
-                                <Text style={{ color: '#F72514' }}>Idumota, Lagos</Text>
+                                <Text style={{ color: '#F72514' }}>{this.props.dataItem.delivery.address}</Text>
                             </View>
                             <View style={{ flex: 4, justifyContent: 'space-between' }}>
-                                <Text>11 Mar 2020, 11:26:10</Text>
-                                <Text>11 Mar 2020, 12:01:16</Text>
+                                <Text>{formatDate(this.props.dataItem.dateCreated)}</Text>
+                                <Text>{formatDate(this.props.dataItem.dateCreated)}</Text>
                             </View>
                             <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
-                                <Text>₦2000</Text>
+                                <Text>₦{this.props.dataItem.cost}</Text>
                             </View>
                         </View>
                     </TouchableOpacity>

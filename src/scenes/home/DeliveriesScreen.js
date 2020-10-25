@@ -12,15 +12,9 @@ export default class DeliveriesScreen extends Component {
         super(props);
         this.state = {
             tab: "completed",
-            completedOrders: [
-                "", "",
-            ],
-            ordersInProgress: [
-                "", "", ""
-            ],
-            pendingOrders: [
-                "",
-            ],
+            completedOrders: [],
+            ordersInProgress: [],
+            pendingOrders: [],
             orderList: [],
             completed: { borderBottomColor: 'red' },
             inProgress: { borderBottomColor: 'transparent' },
@@ -28,14 +22,14 @@ export default class DeliveriesScreen extends Component {
             // navigation:  props.navigation.navigate('IncomingOrderX', {requestorEmail: "state.requestorEmail"}),
             requestorEmail: "",
             doNavigate: true
-            
+
         };
         this.change = this.change.bind(this)
         // this.onMessageReceived.bind(this)
     }
 
     change(message) {
-        this.props.navigation.navigate('IncomingOrderX', {requestorEmail: message})
+        this.props.navigation.navigate('IncomingOrderX', { requestorEmail: message })
     }
 
     componentDidMount() {
@@ -68,7 +62,7 @@ export default class DeliveriesScreen extends Component {
             // handle your locations here
             // to perform long running operation on iOS
             // you need to create background task
-            
+
             BackgroundGeolocation.startTask(taskKey => {
                 console.warn(`latitude: ${location.latitude}, longitude: ${location.longitude}`)
                 this.sendLocation(location)
@@ -136,7 +130,7 @@ export default class DeliveriesScreen extends Component {
 
             // you don't need to check status before start (this is just the example)
             if (!status.isRunning) {
-               BackgroundGeolocation.start(); //triggers start on start event
+                BackgroundGeolocation.start(); //triggers start on start event
             }
         });
 
@@ -148,7 +142,7 @@ export default class DeliveriesScreen extends Component {
 
         this.createNotificationListeners();
 
-        // this.onMessageReceived("here")
+        this.getOrders();
 
 
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
@@ -173,7 +167,7 @@ export default class DeliveriesScreen extends Component {
     }
 
     async checkPermission() {
-       
+
         const enabled = await messaging().hasPermission();
         console.warn(`checkPermission: ${enabled}`)
         // If Premission granted proceed towards token fetch
@@ -234,7 +228,7 @@ export default class DeliveriesScreen extends Component {
     }
 
     sendLocation(location) {
-        fetch('https://airandapi.azurewebsites.net/api/location/driver/update', {
+        fetch(baseUrl() + '/api/location/driver/update', {
             method: 'post',
             headers: {
                 "Authorization": token(),
@@ -246,6 +240,30 @@ export default class DeliveriesScreen extends Component {
         }).then(function (data) {
             console.warn(data)
         });
+    }
+
+    getOrders = () => {
+        fetch(baseUrl() + 'api/dispatch/orders/fetch', {
+            method: 'get',
+            headers: {
+                "Authorization": token(),
+                'Content-Type': "application/json"
+            },
+        }).then(processResponse)
+            .then(res => {
+                if (res.statusCode === 200 && res.data.status) {
+                    console.warn(`data: ==> ${JSON.stringify(res.data.data.inProgress[0].delivery)}`)
+                    this.setState({ completedOrders: res.data.data.completed, pendingOrders: res.data.data.completed, ordersInProgress: res.data.data.inProgress })
+                    // this.props.navigation.navigate('BgTracking')
+                } else {
+                    this.setState({ loading: false })
+                    showTopNotification("danger", res.data.message)
+                }
+            })
+            .catch((error) => {
+                this.setState({ loading: false })
+                showTopNotification("danger", error.message)
+            });
     }
 
     componentWillUnmount() {
@@ -286,10 +304,10 @@ export default class DeliveriesScreen extends Component {
         messaging().setBackgroundMessageHandler(this.onMessageReceived);
     }
 
-    
+
 
     onMessageReceived = (message) => {
-        this.props.navigation.navigate('IncomingOrderX', {data: message.data})
+        this.props.navigation.navigate('IncomingOrderX', { data: message.data })
     }
 
     render() {
@@ -302,7 +320,7 @@ export default class DeliveriesScreen extends Component {
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile tabType={this.state.tab} />
+                            <OrderTile tabType={this.state.tab} dataItem={item}/>
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
@@ -318,7 +336,7 @@ export default class DeliveriesScreen extends Component {
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile tabType={this.state.tab} />
+                            <OrderTile tabType={this.state.tab} dataItem={item}/>
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
@@ -334,7 +352,7 @@ export default class DeliveriesScreen extends Component {
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile tabType={this.state.tab} />
+                            <OrderTile tabType={this.state.tab} dataItem={item} />
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}

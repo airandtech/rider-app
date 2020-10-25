@@ -1,5 +1,6 @@
 import { AsyncStorage } from 'react-native';
 import { showMessage, hideMessage } from "react-native-flash-message";
+import moment from 'moment';
 
 export const loginbaseUrl = () => {
   return 'http://3.10.80.41:9090/';
@@ -60,4 +61,16 @@ export const processResponse = (response) => {
 export const validateEmail = (email) => {
   const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);
+}
+
+export const formatDate = (dateString) =>{
+  //console.warn(`date==> ${dateString}`)
+  //dateString = dateString.split("+")[0]
+  const parsed = moment(new Date(dateString));
+
+  if (!parsed.isValid()) {
+    return dateString;
+  }
+
+  return parsed.format('Do MMM YYYY');
 }
