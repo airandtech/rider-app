@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import OrderTile from '../../components/OrderTile';
-import { processResponse } from '../../utilities';
+import { getToken, processResponse } from '../../utilities';
 
 export default class IncomingRequestScreen extends Component {
     constructor(props) {
@@ -19,12 +19,12 @@ export default class IncomingRequestScreen extends Component {
         };
     }
 
-    acceptRequest = (location) => {
+    acceptRequest = async (location) => {
         //alert('mamam')
         fetch(`https://airandapi.azurewebsites.net/api/dispatch/accept/${this.state.data.requestorEmail}`, {
             method: 'get',
             headers: {
-                "Authorization": token(),
+                "Authorization": await getToken(),
                 'Content-Type': "application/json"
             },
         }).then(processResponse)

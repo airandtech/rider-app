@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler,
 import OrderTile from '../../components/OrderTile';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import AsyncStorage from '@react-native-community/async-storage';
-import { baseUrl, processResponse, showTopNotification, token } from '../../utilities';
+import { baseUrl, getToken, processResponse, showTopNotification, token } from '../../utilities';
 import messaging from '@react-native-firebase/messaging';
 
 export default class DeliveriesScreen extends Component {
@@ -22,7 +22,7 @@ export default class DeliveriesScreen extends Component {
             // navigation:  props.navigation.navigate('IncomingOrderX', {requestorEmail: "state.requestorEmail"}),
             requestorEmail: "",
             doNavigate: true
-
+ 
         };
         this.change = this.change.bind(this)
         // this.onMessageReceived.bind(this)
@@ -32,7 +32,7 @@ export default class DeliveriesScreen extends Component {
         this.props.navigation.navigate('IncomingOrderX', { requestorEmail: message })
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         BackgroundGeolocation.configure({
             desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
             stationaryRadius: 50,
@@ -49,7 +49,7 @@ export default class DeliveriesScreen extends Component {
             stopOnStillActivity: false,
             url: 'https://airandapi.azurewebsites.net/api/location/driver/update',
             httpHeaders: {
-                'Authorization': token()
+                'Authorization': await getToken()
             },
             // customize post properties
             postTemplate: {
@@ -142,8 +142,7 @@ export default class DeliveriesScreen extends Component {
 
         this.createNotificationListeners();
 
-        this.getOrders();
-
+        await this.getOrders();
 
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
@@ -210,7 +209,7 @@ export default class DeliveriesScreen extends Component {
             method: 'get',
             headers: {
                 'Content-Type': "application/json",
-                'Authorization': token()
+                'Authorization': await getToken()
             },
         }).then(processResponse)
             .then(res => {
@@ -227,11 +226,11 @@ export default class DeliveriesScreen extends Component {
             });
     }
 
-    sendLocation(location) {
+    async sendLocation(location) {
         fetch(baseUrl() + '/api/location/driver/update', {
             method: 'post',
             headers: {
-                "Authorization": token(),
+                "Authorization": await getToken(),
                 'Content-Type': "application/json"
             },
             body: JSON.stringify({ 'latitude': location.latitude, 'longitude': location.longitude })
@@ -242,19 +241,21 @@ export default class DeliveriesScreen extends Component {
         });
     }
 
-    getOrders = () => {
+    getOrders = async () => {
+        let bearer = await getToken()
+        //  let bearer = (async () => {  await AsyncStorage.setItem('@isAuthenticated', 'true')  })();
+        console.warn(`bearer ==> ${bearer}`)
         fetch(baseUrl() + 'api/dispatch/orders/fetch', {
             method: 'get',
             headers: {
-                "Authorization": token(),
+                "Authorization": await getToken(),
                 'Content-Type': "application/json"
             },
         }).then(processResponse)
             .then(res => {
                 if (res.statusCode === 200 && res.data.status) {
-                    console.warn(`data: ==> ${JSON.stringify(res.data.data.inProgress[0].delivery)}`)
-                    this.setState({ completedOrders: res.data.data.completed, pendingOrders: res.data.data.completed, ordersInProgress: res.data.data.inProgress })
-                    // this.props.navigation.navigate('BgTracking')
+                    showTopNotification("success", "Orders Updated!!!")
+                    this.setState({ completedOrders: res.data.data.completed, pendingOrders: res.data.data.pending, ordersInProgress: res.data.data.inProgress })
                 } else {
                     this.setState({ loading: false })
                     showTopNotification("danger", res.data.message)
@@ -264,6 +265,10 @@ export default class DeliveriesScreen extends Component {
                 this.setState({ loading: false })
                 showTopNotification("danger", error.message)
             });
+    }
+
+    onOrderAction = () => {
+        this.getOrders() // do stuff
     }
 
     componentWillUnmount() {
@@ -304,8 +309,6 @@ export default class DeliveriesScreen extends Component {
         messaging().setBackgroundMessageHandler(this.onMessageReceived);
     }
 
-
-
     onMessageReceived = (message) => {
         this.props.navigation.navigate('IncomingOrderX', { data: message.data })
     }
@@ -320,7 +323,7 @@ export default class DeliveriesScreen extends Component {
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile tabType={this.state.tab} dataItem={item}/>
+                            <OrderTile parentOrderAction={this.onOrderAction}  navigation={this.props.navigation} tabType={this.state.tab} dataItem={item}/>
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
@@ -336,7 +339,7 @@ export default class DeliveriesScreen extends Component {
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile tabType={this.state.tab} dataItem={item}/>
+                            <OrderTile parentOrderAction={this.onOrderAction} navigation={this.props.navigation} tabType={this.state.tab} dataItem={item}/>
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
@@ -352,7 +355,7 @@ export default class DeliveriesScreen extends Component {
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile tabType={this.state.tab} dataItem={item} />
+                            <OrderTile parentOrderAction={this.onOrderAction}  navigation={this.props.navigation} tabType={this.state.tab} dataItem={item} />
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}

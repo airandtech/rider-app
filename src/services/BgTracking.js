@@ -5,6 +5,7 @@ import {CommonActions} from '@react-navigation/native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   baseUrl,
+  getToken,
   processResponse,
   showTopNotification,
   token,
@@ -19,7 +20,7 @@ class BgTracking extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
       stationaryRadius: 50,
@@ -36,7 +37,7 @@ class BgTracking extends Component {
       stopOnStillActivity: false,
       url: 'https://airandapi.azurewebsites.net/api/location/driver/update',
       httpHeaders: {
-        Authorization: token(),
+        Authorization: await getToken(),
       },
       // customize post properties
       postTemplate: {
@@ -228,7 +229,7 @@ class BgTracking extends Component {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token(),
+        Authorization: await getToken(),
       },
     })
       .then(processResponse)
@@ -256,11 +257,11 @@ class BgTracking extends Component {
     console.warn(`data:: ${JSON.stringify(message.data)}`);
   }
 
-  sendLocation(location) {
+  async sendLocation(location) {
     fetch('https://airandapi.azurewebsites.net/api/location/driver/update', {
       method: 'post',
       headers: {
-        Authorization: token(),
+        Authorization: await getToken(),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
