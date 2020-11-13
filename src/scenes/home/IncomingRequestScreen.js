@@ -6,21 +6,28 @@ import {
     Image,
     TouchableOpacity,
     FlatList,
+    Dimensions,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
+import RNSwipeVerify from 'react-native-swipe-verify';
 import OrderTile from '../../components/OrderTile';
-import { getToken, processResponse } from '../../utilities';
+import { getToken, processResponse, showTopNotification } from '../../utilities';
+
+const { width } = Dimensions.get('window');
 
 export default class IncomingRequestScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
             data: props.route.params.data,
+            // data: {},
+            isUnlocked: false,
+            isUploaded: false,
         };
     }
 
     acceptRequest = async (location) => {
-        //alert('mamam')
+        
         fetch(`https://airandapi.azurewebsites.net/api/dispatch/accept/${this.state.data.requestorEmail}`, {
             method: 'get',
             headers: {
@@ -28,25 +35,29 @@ export default class IncomingRequestScreen extends Component {
                 'Content-Type': "application/json"
             },
         }).then(processResponse)
-        .then((res) => {
-            if (res.statusCode === 200 && res.data.status) {
-                showTopNotification('success', 'Order Accepted');
-                this.props.navigation.navigate('App');
-            } else if (res.statusCode === 500) {
+            .then((res) => {
+                if (res.statusCode === 200 && res.data.status) {
+                    showTopNotification('success', 'Order Accepted');
+                    this.swipeVerify2.reset()
+                    this.props.navigation.navigate('App');
+                } else if (res.statusCode === 500) {
+                    this.setState({ loading: false });
+                    showTopNotification('danger', 'Oops!!! Something went wrong');
+                    this.swipeVerify2.reset()
+                } else {
+                    this.setState({ loading: false });
+                    showTopNotification('danger', res.data.message);
+                    this.swipeVerify2.reset()
+                }
+            })
+            .catch((error) => {
                 this.setState({ loading: false });
-                showTopNotification('danger', 'Oops!!! Something went wrong');
-            } else {
-                this.setState({ loading: false });
-                showTopNotification('danger', res.data.message);
-            }
-        })
-        .catch((error) => {
-            this.setState({ loading: false });
-            showTopNotification('danger', error.message);
-        });
+                showTopNotification('danger', error.message);
+            });
     }
 
     render() {
+        const { isUnlocked, isUploaded } = this.state
         return (
             <View style={styles.container}>
                 <View style={styles.topLayer}>
@@ -65,47 +76,33 @@ export default class IncomingRequestScreen extends Component {
                             <Text style={styles.bottomText}>{this.state.data.distance}</Text>
                         </View>
                         <Text style={[styles.bottomText, { fontSize: 23 }]}>
-                        {this.state.data.address}
+                            {this.state.data.address}
                         </Text>
                         <Text style={[styles.bottomText, { marginTop: 10 }]}>
                             {this.state.data.requestorName}
                         </Text>
                     </View>
-
-                    <TouchableOpacity
-                        onPress={() => {
-                            this.acceptRequest()
-                        }}
-                        style={{
-                            flexDirection: 'row',
-                            paddingTop: 30,
-                            backgroundColor: '#0ED91B',
-                            marginTop: 10,
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: 20,
-                        }}>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Icon
-                                active
-                                name="double-arrow"
-                                size={25}
-                                color={'#FFF'}
-                                type="material-icons"
-                            />
-                        </View>
-                        <Text style={{ fontSize: 22, color: '#FFF' }}>ACCEPT</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Icon
-                                active
-                                name="double-arrow"
-                                size={25}
-                                color={'#FFF'}
-                                type="material-icons"
-                            />
-                        </View>
-                    </TouchableOpacity>
                 </View>
+                <RNSwipeVerify
+                    ref={(ref) => (this.swipeVerify2 = ref)}
+                    width={width - 50}
+                    buttonSize={60}
+                    buttonColor="#0ED91B"
+                    backgroundColor="#0ED91B"
+                    textColor="#FFF"
+                    borderRadius={0}
+                    okButton={{ visible: true, duration: 400 }}
+                    onVerified={() => {
+                        this.setState({ isUploaded: true });
+                        this.acceptRequest();
+                    }}
+                    icon={
+                        isUnlocked ? <View ><Icon name='double-arrow' size={25} color={'#FFF'} type='material-icons' /></View> : <View ><Icon name='double-arrow' size={25} color={'#FFF'} type='material-icons' /></View>
+
+                    }
+                >
+                    <Text style={{ color: '#FFF', fontSize: 20 }}>ACCEPT</Text>
+                </RNSwipeVerify>
             </View>
         );
     }
@@ -114,7 +111,7 @@ export default class IncomingRequestScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: '#0ED91B',
     },
     topLayer: {
         flex: 4,

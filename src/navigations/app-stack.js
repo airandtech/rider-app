@@ -11,7 +11,7 @@ function AppStackNavigator() {
   return (
     <AppStack.Navigator>
       <AppStack.Screen options={{ headerShown: false }} name="AppNavigator" component={AppNavigator} />
-      <AppStack.Screen options={{ headerShown: false }} name="IncomingOrderX" component={IncomingOrderScreen} />
+      <AppStack.Screen options={{ headerShown: false }} name="IncomingOrder" component={IncomingOrderScreen} />
     </AppStack.Navigator>
 
   );

@@ -32,11 +32,6 @@ class OrderTile extends Component {
     componentDidMount() {
         this.setState({ isPressed: false });
         this._handleTabClicked();
-
-        // setInterval(() => {
-        //     showTopNotification("danger", "Orders Updated!!!")
-        //     this.props.navigation.navigate('IncomingOrderX')
-        // }, 500);
     }
 
     _handleTabClicked() {

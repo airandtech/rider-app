@@ -13,7 +13,6 @@ function AuthNavigator() {
       <AuthStack.Screen options={{ headerShown: false }} name="Verification" component={VerificationScreen} />
       <AuthStack.Screen options={{ headerShown: false }} name="OTP" component={OtpScreen} />
       <AuthStack.Screen options={{ headerShown: false }} name="BgTracking" component={BgTracking} />
-      <AuthStack.Screen options={{ headerShown: false }} name="IncomingOrder" component={IncomingOrderScreen} />
       <AuthStack.Screen options={{ headerShown: false }} name="AppHome" component={AppNavigator} />
       <AuthStack.Screen
         options={{

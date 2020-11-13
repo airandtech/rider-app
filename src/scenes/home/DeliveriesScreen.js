@@ -19,17 +19,10 @@ export default class DeliveriesScreen extends Component {
             completed: { borderBottomColor: 'red' },
             inProgress: { borderBottomColor: 'transparent' },
             pending: { borderBottomColor: 'transparent' },
-            // navigation:  props.navigation.navigate('IncomingOrderX', {requestorEmail: "state.requestorEmail"}),
             requestorEmail: "",
             doNavigate: true
  
         };
-        this.change = this.change.bind(this)
-        // this.onMessageReceived.bind(this)
-    }
-
-    change(message) {
-        this.props.navigation.navigate('IncomingOrderX', { requestorEmail: message })
     }
 
     async componentDidMount() {
@@ -310,7 +303,11 @@ export default class DeliveriesScreen extends Component {
     }
 
     onMessageReceived = (message) => {
-        this.props.navigation.navigate('IncomingOrderX', { data: message.data })
+        this.props.navigation.navigate('IncomingOrder', { data: message.data })
+    }
+
+    sd = () => {
+        // this.props.navigation.navigate('IncomingOrderX', { data: message.data })
     }
 
     render() {
