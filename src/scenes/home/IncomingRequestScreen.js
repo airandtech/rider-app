@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     FlatList,
     Dimensions,
+    Vibration,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import RNSwipeVerify from 'react-native-swipe-verify';
@@ -14,6 +15,13 @@ import OrderTile from '../../components/OrderTile';
 import { getToken, processResponse, showTopNotification } from '../../utilities';
 
 const { width } = Dimensions.get('window');
+const ONE_SECOND_IN_MS = 1000;
+
+const PATTERN = [
+    1 * ONE_SECOND_IN_MS,
+    2 * ONE_SECOND_IN_MS,
+    3 * ONE_SECOND_IN_MS
+];
 
 export default class IncomingRequestScreen extends Component {
     constructor(props) {
@@ -26,8 +34,12 @@ export default class IncomingRequestScreen extends Component {
         };
     }
 
+    componentDidMount(){
+        Vibration.vibrate(PATTERN, true)
+    }
+
     acceptRequest = async (location) => {
-        
+        Vibration.cancel()
         fetch(`https://airandapi.azurewebsites.net/api/dispatch/accept/${this.state.data.requestorEmail}`, {
             method: 'get',
             headers: {
