@@ -8,6 +8,7 @@ import {
     Dimensions,
     TouchableWithoutFeedback,
     TouchableOpacity,
+    Linking,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { baseUrl, formatDate, getToken, processResponse, showTopNotification, token } from '../utilities';
@@ -96,6 +97,7 @@ class OrderTile extends Component {
                                         justifyContent: 'space-between',
                                     }}>
                                     <Icon
+                                        onPress={()=> {Linking.openURL(`tel:${this.props.dataItem.pickUp.phone}`)}}
                                         active
                                         name="call"
                                         size={25}
@@ -139,6 +141,7 @@ class OrderTile extends Component {
                                         justifyContent: 'space-between',
                                     }}>
                                     <Icon
+                                        onPress={()=> {Linking.openURL(`tel:${this.props.dataItem.delivery.phone}`)}}
                                         active
                                         name="call"
                                         size={25}
@@ -180,7 +183,7 @@ class OrderTile extends Component {
 
                             }
                         >
-                            <Text style={{color: '#FFF', fontSize: 18}}>{isUploaded ? this.state.actionedText : this.state.actionText}</Text>
+                            <Text style={{color: '#FFF', fontSize: 18, fontFamily: 'Montserrat-Regular'}}>{isUploaded ? this.state.actionedText : this.state.actionText}</Text>
                         </RNSwipeVerify>
                         </View>
                     </View>
@@ -196,7 +199,7 @@ class OrderTile extends Component {
                             this.setState({ isPressed: !this.state.isPressed });
                             this._handleTabClicked();
                         }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 18, marginLeft: 25 }}>
+                        <Text style={{ fontFamily: 'Montserrat-Bold', fontSize: 18, marginLeft: 25 }}>
                             Order {this.props.dataItem.id}
                         </Text>
                         <View style={styles.orderTab}>
@@ -218,17 +221,17 @@ class OrderTile extends Component {
                                 />
                             </View>
                             <View style={{ flex: 3 }}>
-                                <Text style={{ color: '#F72514' }}>
+                                <Text style={[styles.fromToStyle, { color: '#F72514' }]}>
                                     {this.props.dataItem.pickUp.address}
                                 </Text>
-                                <Text>to</Text>
-                                <Text style={{ color: '#F72514' }}>
+                                <Text style={styles.fromToStyle}>to</Text>
+                                <Text style={[styles.fromToStyle, { color: '#F72514' }]}>
                                     {this.props.dataItem.delivery.address}
                                 </Text>
                             </View>
                             <View style={{ flex: 4, justifyContent: 'space-between' }}>
-                                <Text>{formatDate(this.props.dataItem.dateCreated)}</Text>
-                                <Text>{formatDate(this.props.dataItem.dateCreated)}</Text>
+                                <Text style={styles.dateStyle}>{formatDate(this.props.dataItem.dateCreated)}</Text>
+                                <Text style={styles.dateStyle}>{formatDate(this.props.dataItem.dateCreated)}</Text>
                             </View>
                             <View
                                 style={{
@@ -236,7 +239,7 @@ class OrderTile extends Component {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}>
-                                <Text>₦{this.props.dataItem.cost}</Text>
+                                <Text style={styles.amountStyle}>₦{this.props.dataItem.cost}</Text>
                             </View>
                         </View>
                     </TouchableOpacity>
@@ -265,12 +268,23 @@ const styles = StyleSheet.create({
     ddTitle: {
         color: '#707070',
         fontSize: 12,
+        fontFamily: 'Montserrat-Regular',
     },
     ddValue: {
         color: '#000',
         fontSize: 16,
+        fontFamily: 'Montserrat-Regular',
     },
     sliderButton:{
        marginBottom: 55
+    },
+    dateStyle: {
+        fontFamily: 'Montserrat-Regular',
+    },
+    amountStyle: {
+        fontFamily: 'Montserrat-Regular',
+    },
+    fromToStyle: {
+        fontFamily: 'Montserrat-Regular',
     }
 });

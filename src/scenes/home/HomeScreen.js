@@ -15,7 +15,7 @@ export default class HomeScreen extends Component {
     render(){
     return (
         <View style={styles.container}>
-            <Text>Home</Text>
+            <Text style={{fontFamily: 'Montserrat-Regular'}}>Home</Text>
         </View>
     );
     }

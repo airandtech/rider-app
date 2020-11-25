@@ -104,9 +104,9 @@ export default class OtpScreen extends Component {
       <View style={styles.container}>
         <Image
           source={require('../../assets/images/airand_logo.png')}
-          style={{height: 55, width: 55, marginBottom: 10}}
+          style={{height: 65, width: 60, marginBottom: 10}}
         />
-        <Text style={[styles.title]}>AIRAND</Text>
+        <Text style={[styles.title, {fontFamily: 'JuliusSansOne-Regular'}]}>AIRAND</Text>
         <Text style={[styles.title, {fontSize: 25}]}>PILOT</Text>
         <Text style={[styles.title, {fontSize: 25}]}>Login</Text>
         <View style={styles.inputContainer}>
@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 35,
     marginTop: 7,
+    fontFamily: 'Montserrat-Medium'
   },
   inputContainer: {
     flexDirection: 'row',
@@ -156,6 +157,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingVertical: 0,
     width: '80%',
+    fontFamily: 'Montserrat-Regular'
   },
   button: {
     width: '80%',
@@ -169,5 +171,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFF',
     fontSize: 18,
+    fontFamily: 'Montserrat-Medium'
   },
 });

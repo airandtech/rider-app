@@ -15,7 +15,7 @@ export default class SettingsScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text>Settings</Text>
+                <Text style={{fontFamily: 'Montserrat-Regular'}}>Settings</Text>
             </View>
         );
     }

@@ -303,7 +303,7 @@ export default class DeliveriesScreen extends Component {
     }
 
     onMessageReceived = (message) => {
-        this.props.navigation.navigate('IncomingOrder', { data: message.data })
+        this.props.navigation.navigate('IncomingRequest', { data: message.data })
     }
 
     sd = () => {
@@ -381,14 +381,14 @@ const styles = StyleSheet.create({
         fontSize: 35, textTransform: "uppercase", marginTop: 10
     },
     header: {
-        backgroundColor: '#2AA1B5',
+        backgroundColor: '#07223D',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
     headerText: {
         color: '#FFF',
-        fontWeight: "bold",
+        fontFamily: 'Montserrat-Bold',
         fontSize: 18
     }
 }); 

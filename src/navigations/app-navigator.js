@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../scenes/home/HomeScreen';
 import SettingsScreen from '../scenes/home/SettingsScreen';
@@ -11,19 +11,45 @@ const Tab = createBottomTabNavigator();
 
 function AppNavigator() {
 
+    const [activeColour, setActiveColour] = useState('#F72514');
+    const [inactiveColour, setInactiveColour] = useState('#FFF');
+
 
     return (
         <Tab.Navigator
             initialRouteName="Deliveries"
+            screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Deliveries') {
+                this.setDColour('yellow')
+            } else if (route.name === 'Calendar') {
+
+            } else if (route.name === 'Support') {
+
+            } else if (route.name === 'Setup') {
+              
+            } else {
+              
+              //return <Ionicons name={iconName} size={size} color={color} />;
+            }
+
+            // You can return any component that you like here!
+            // return <Ionicons name={iconName} size={size} color={color} />;
+            //  return ({menuBarIcon});
+          },
+        })}
             tabBarOptions={{
                 activeTintColor: '#F72514',
                 inactiveTintColor: '#FFF',
                 style: {
                     backgroundColor: '#07223D',
-                    paddingTop: 10
+                    paddingVertical: 10,
+                    minHeight: 60
                 },
                 labelStyle:{
-                    fontWeight: 'bold',
+                    fontFamily: 'Montserrat-Bold',
                     fontSize: 14
                 }
             }}
@@ -31,10 +57,10 @@ function AppNavigator() {
             <Tab.Screen name="Deliveries" component={DeliveriesScreen}
                 options={{
                     tabBarLabel: 'Deliveries',
-                    tabBarIcon: () => (
+                    tabBarIcon: ({focused}) => (
                         <Image
                             source={require('../assets/images/deliveries_icon.png')}
-                            style={{ height: 25, width: 25, tintColor: '#F72514' }}
+                            style={{ height: 25, width: 25, tintColor: focused ? activeColour : inactiveColour }}
                         />
 
                     ),
@@ -43,10 +69,10 @@ function AppNavigator() {
             <Tab.Screen name="Home" component={HomeScreen}
                 options={{
                     tabBarLabel: 'Home',
-                    tabBarIcon: () => (
+                    tabBarIcon: ({focused}) => (
                         <Image
                             source={require('../assets/images/home_icon.png')}
-                            style={{ height: 25, width: 25, tintColor: '#FFF'}}
+                            style={{ height: 25, width: 25, tintColor: focused ? activeColour : inactiveColour}}
                         />
                     ),
                     // tabBarBadge: 3,
@@ -56,10 +82,10 @@ function AppNavigator() {
             <Tab.Screen name="Settings" component={SettingsScreen}
                 options={{
                     tabBarLabel: 'Settings',
-                    tabBarIcon: () => (
+                    tabBarIcon: ({focused}) => (
                         <Image
                             source={require('../assets/images/settings_icon.png')}
-                            style={{ height: 25, width: 25, tintColor: '#FFF'}}
+                            style={{ height: 25, width: 25, tintColor: focused ? activeColour : inactiveColour }}
                         />
                     ),
                     // tabBarBadge: 3,

@@ -7,6 +7,7 @@ import AuthNavigator from './auth-navigator';
 import AppNavigator from './app-navigator';
 import FlashMessage from "react-native-flash-message";
 import AppStackNavigator from './app-stack';
+import IncomingRequestScreen from '../scenes/home/IncomingRequestScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,8 +20,9 @@ export default function MyStack() {
                 <Stack.Screen options={{headerShown: false}} name="Auth" component={AuthNavigator} />
                 <Stack.Screen options={{headerShown: false}} name="App" component={AppNavigator} />
                 <Stack.Screen options={{headerShown: false}} name="AppStack" component={AppStackNavigator} />
+                <Stack.Screen options={{headerShown: false}} name="IncomingRequest" component={IncomingRequestScreen} />
             </Stack.Navigator>
-            <FlashMessage position="top"  /> 
+            <FlashMessage position="top" textStyle={{fontFamily: 'Montserrat-Regular'}}  /> 
         </NavigationContainer>
     );
 }

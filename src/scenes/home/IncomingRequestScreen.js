@@ -34,9 +34,36 @@ export default class IncomingRequestScreen extends Component {
         };
     }
 
-    componentDidMount(){
+    componentDidMount() {
         Vibration.vibrate(PATTERN, true)
     }
+
+    playSound = () => {
+        // Import the react-native-sound module
+        var Sound = require('react-native-sound');
+
+        // Load the sound file 'whoosh.mp3' from the app bundle
+        // See notes below about preloading sounds within initialization code below.
+        var whoosh = new Sound('chip.mp3', Sound.MAIN_BUNDLE, (error) => {
+            if (error) {
+                console.warn('failed to load the sound', error);
+                return;
+            }
+            // loaded successfully
+            console.warn('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
+
+            // Play the sound with an onEnd callback
+            whoosh.play((success) => {
+                if (success) {
+                    console.warn('successfully finished playing');
+                } else {
+                    console.warn('playback failed due to audio decoding errors');
+                }
+            });
+        });
+
+    }
+
 
     acceptRequest = async (location) => {
         Vibration.cancel()
@@ -54,6 +81,7 @@ export default class IncomingRequestScreen extends Component {
                     this.props.navigation.navigate('App');
                 } else if (res.statusCode === 500) {
                     this.setState({ loading: false });
+                    console.warn(`Email: ${this.state.data.requestorEmail}`)
                     showTopNotification('danger', 'Oops!!! Something went wrong');
                     this.swipeVerify2.reset()
                 } else {
@@ -77,7 +105,7 @@ export default class IncomingRequestScreen extends Component {
                         onPress={() => this.props.navigation.navigate('App')}
                         style={styles.declineButton}>
                         <Icon active name="cross" size={30} color={'#FFF'} type="entypo" />
-                        <Text style={{ fontSize: 25, color: '#FFF' }}>Decline</Text>
+                        <Text style={{ fontSize: 25, color: '#FFF', fontFamily: 'Montserrat-Regular' }}>Decline</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -113,7 +141,7 @@ export default class IncomingRequestScreen extends Component {
 
                     }
                 >
-                    <Text style={{ color: '#FFF', fontSize: 20 }}>ACCEPT</Text>
+                    <Text style={{ color: '#FFF', fontSize: 20, fontFamily: 'Montserrat-Regular' }}>ACCEPT</Text>
                 </RNSwipeVerify>
             </View>
         );
@@ -150,6 +178,6 @@ const styles = StyleSheet.create({
     bottomText: {
         fontSize: 25,
         color: '#FFF',
-        fontWeight: 'bold',
+        fontFamily: 'Montserrat-Bold'
     },
 });
