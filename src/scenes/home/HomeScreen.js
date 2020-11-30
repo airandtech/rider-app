@@ -1,6 +1,6 @@
 
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, BackHandler } from 'react-native';
+import { StyleSheet, View, Text, Image, BackHandler, TouchableOpacity } from 'react-native';
 
 export default class HomeScreen extends Component {
 
@@ -16,6 +16,9 @@ export default class HomeScreen extends Component {
     return (
         <View style={styles.container}>
             <Text style={{fontFamily: 'Montserrat-Regular'}}>Home</Text>
+            {/* <TouchableOpacity onPress={() => this.props.navigation.navigate('IncomingRequest', { data: "message.dataaaa" })}>
+                <Text>Go to Incoming Requests</Text>
+            </TouchableOpacity> */}
         </View>
     );
     }

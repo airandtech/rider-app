@@ -1,11 +1,12 @@
 
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler, Alert } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler, Alert, Dimensions } from 'react-native';
 import OrderTile from '../../components/OrderTile';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import AsyncStorage from '@react-native-community/async-storage';
 import { baseUrl, getToken, processResponse, showTopNotification, token } from '../../utilities';
 import messaging from '@react-native-firebase/messaging';
+import KeepAwake from 'react-native-keep-awake';
 
 export default class DeliveriesScreen extends Component {
     constructor(props) {
@@ -36,9 +37,9 @@ export default class DeliveriesScreen extends Component {
             startOnBoot: false,
             stopOnTerminate: true,
             locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
-            interval: 10000,
-            fastestInterval: 5000,
-            activitiesInterval: 10000,
+            interval: 180000,
+            fastestInterval: 120000,
+            activitiesInterval: 180000,
             stopOnStillActivity: false,
             url: 'https://airandapi.azurewebsites.net/api/location/driver/update',
             httpHeaders: {
@@ -303,6 +304,7 @@ export default class DeliveriesScreen extends Component {
     }
 
     onMessageReceived = (message) => {
+        console.warn(JSON.stringify(`+++++++==>New Request: ${JSON.stringify(message.data)}`))
         this.props.navigation.navigate('IncomingRequest', { data: message.data })
     }
 
@@ -313,7 +315,7 @@ export default class DeliveriesScreen extends Component {
     render() {
         let body
         if (this.state.tab === 'completed') {
-            body = <View>
+            body = <View style={{height: Dimensions.get('window').height * 0.8}}>
                 <FlatList
                     style={{ paddingBottom: 5 }}
                     data={this.state.completedOrders}
@@ -329,7 +331,7 @@ export default class DeliveriesScreen extends Component {
 
         }
         if (this.state.tab === 'inProgress') {
-            body = <View>
+            body = <View style={{height: Dimensions.get('window').height * 0.8}}>
                 <FlatList
                     style={{ paddingBottom: 5 }}
                     data={this.state.ordersInProgress}
@@ -345,7 +347,7 @@ export default class DeliveriesScreen extends Component {
 
         }
         if (this.state.tab === 'pending') {
-            body = <View>
+            body = <View style={{height: Dimensions.get('window').height * 0.8}}>
                 <FlatList
                     style={{ paddingBottom: 5 }}
                     data={this.state.pendingOrders}
@@ -368,6 +370,7 @@ export default class DeliveriesScreen extends Component {
                     <TouchableOpacity style={[{ borderBottomWidth: 4, paddingVertical: 20, paddingHorizontal: 20 }, this.state.pending]} onPress={() => this._handleTabClick('pending')}><Text style={styles.headerText}>Pending</Text></TouchableOpacity>
                 </View>
                 {body}
+                <KeepAwake />
             </View>
         );
     }

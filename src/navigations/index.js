@@ -21,6 +21,7 @@ export default function MyStack() {
                 <Stack.Screen options={{headerShown: false}} name="App" component={AppNavigator} />
                 <Stack.Screen options={{headerShown: false}} name="AppStack" component={AppStackNavigator} />
                 <Stack.Screen options={{headerShown: false}} name="IncomingRequest" component={IncomingRequestScreen} />
+                
             </Stack.Navigator>
             <FlashMessage position="top" textStyle={{fontFamily: 'Montserrat-Regular'}}  /> 
         </NavigationContainer>
