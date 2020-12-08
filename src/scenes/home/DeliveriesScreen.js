@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { baseUrl, getToken, processResponse, showTopNotification, token } from '../../utilities';
 import messaging from '@react-native-firebase/messaging';
 import KeepAwake from 'react-native-keep-awake';
+import { LocalNotification } from '../../services/LocalPushController';
 
 export default class DeliveriesScreen extends Component {
     constructor(props) {
@@ -322,6 +323,7 @@ export default class DeliveriesScreen extends Component {
     onMessageReceivedInBackground = async (message) => {
         this.playSound();
         console.warn(JSON.stringify(`BackGround+++++++==>New Request: ${JSON.stringify(message.data)}`));
+        LocalNotification(message.data)
         this.props.navigation.navigate('IncomingRequest', { data: message.data })
     }
 
