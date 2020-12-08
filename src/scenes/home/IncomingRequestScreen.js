@@ -91,7 +91,7 @@ export default class IncomingRequestScreen extends Component {
     Vibration.cancel();
     this.setState({loading: true});
     fetch(
-      `https://airandapi.azurewebsites.net/api/dispatch/accept/${this.state.data.requestorEmail}`,
+      `https://airandapi.azurewebsites.net/api/dispatch/accept/${this.state.data.transactionId}/${this.state.data.requestorEmail}`,
       {
         method: 'get',
         headers: {

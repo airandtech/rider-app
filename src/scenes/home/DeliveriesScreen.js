@@ -1,6 +1,6 @@
 
 import React, { Component, useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler, Alert, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, FlatList, BackHandler, Alert, Dimensions, RefreshControl } from 'react-native';
 import OrderTile from '../../components/OrderTile';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -21,9 +21,17 @@ export default class DeliveriesScreen extends Component {
             inProgress: { borderBottomColor: 'transparent' },
             pending: { borderBottomColor: 'transparent' },
             requestorEmail: "",
-            doNavigate: true
- 
+            doNavigate: true,
+            refreshing: false,
+
         };
+    }
+
+    _onRefresh = () => {
+        this.setState({ refreshing: true });
+        this.getOrders().then(() => {
+            this.setState({ refreshing: false });
+        });
     }
 
     async componentDidMount() {
@@ -300,11 +308,20 @@ export default class DeliveriesScreen extends Component {
     async createNotificationListeners() {
         messaging().onMessage(this.onMessageReceived);
         //.bind(this);
-        messaging().setBackgroundMessageHandler(this.onMessageReceived);
+        messaging().setBackgroundMessageHandler(this.onMessageReceivedInBackground);
+
+        
     }
 
     onMessageReceived = (message) => {
         console.warn(JSON.stringify(`+++++++==>New Request: ${JSON.stringify(message.data)}`))
+        //play notification sound here
+        this.props.navigation.navigate('IncomingRequest', { data: message.data })
+    }
+
+    onMessageReceivedInBackground = async (message) => {
+        this.playSound();
+        console.warn(JSON.stringify(`BackGround+++++++==>New Request: ${JSON.stringify(message.data)}`));
         this.props.navigation.navigate('IncomingRequest', { data: message.data })
     }
 
@@ -312,52 +329,85 @@ export default class DeliveriesScreen extends Component {
         // this.props.navigation.navigate('IncomingOrderX', { data: message.data })
     }
 
+    playSound = () => {
+        // Import the react-native-sound module
+        var Sound = require('react-native-sound');
+    
+        // Load the sound file 'whoosh.mp3' from the app bundle
+        // See notes below about preloading sounds within initialization code below.
+        var whoosh = new Sound('chip.mp3', Sound.MAIN_BUNDLE, (error) => {
+          if (error) {
+            console.warn('failed to load the sound', error);
+            return;
+          }
+          // loaded successfully
+          console.warn(
+            'duration in seconds: ' +
+              whoosh.getDuration() +
+              'number of channels: ' +
+              whoosh.getNumberOfChannels(),
+          );
+    
+          // Play the sound with an onEnd callback
+          whoosh.play((success) => {
+            if (success) {
+              console.warn('successfully finished playing');
+            } else {
+              console.warn('playback failed due to audio decoding errors');
+            }
+          });
+        });
+      };
+
     render() {
         let body
         if (this.state.tab === 'completed') {
-            body = <View style={{height: Dimensions.get('window').height * 0.8}}>
+            body = <View style={{ height: Dimensions.get('window').height * 0.8 }}>
                 <FlatList
                     style={{ paddingBottom: 5 }}
                     data={this.state.completedOrders}
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile parentOrderAction={this.onOrderAction}  navigation={this.props.navigation} tabType={this.state.tab} dataItem={item}/>
+                            <OrderTile parentOrderAction={this.onOrderAction} navigation={this.props.navigation} tabType={this.state.tab} dataItem={item} />
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
+                    refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this._onRefresh} />}
                 />
             </View>
 
         }
         if (this.state.tab === 'inProgress') {
-            body = <View style={{height: Dimensions.get('window').height * 0.8}}>
+            body = <View style={{ height: Dimensions.get('window').height * 0.8 }}>
                 <FlatList
                     style={{ paddingBottom: 5 }}
                     data={this.state.ordersInProgress}
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile parentOrderAction={this.onOrderAction} navigation={this.props.navigation} tabType={this.state.tab} dataItem={item}/>
+                            <OrderTile parentOrderAction={this.onOrderAction} navigation={this.props.navigation} tabType={this.state.tab} dataItem={item} />
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
+                    refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this._onRefresh} />}
                 />
             </View>
 
         }
         if (this.state.tab === 'pending') {
-            body = <View style={{height: Dimensions.get('window').height * 0.8}}>
+            body = <View style={{ height: Dimensions.get('window').height * 0.8 }}>
                 <FlatList
                     style={{ paddingBottom: 5 }}
                     data={this.state.pendingOrders}
                     extraData={this.state}
                     renderItem={({ item }) => (
                         <View style={{ flex: 1, flexDirection: 'column', margin: 2, }}>
-                            <OrderTile parentOrderAction={this.onOrderAction}  navigation={this.props.navigation} tabType={this.state.tab} dataItem={item} />
+                            <OrderTile parentOrderAction={this.onOrderAction} navigation={this.props.navigation} tabType={this.state.tab} dataItem={item} />
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
+                    refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={this._onRefresh} />}
                 />
             </View>
 
@@ -365,9 +415,9 @@ export default class DeliveriesScreen extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity style={[{ borderBottomWidth: 4, paddingVertical: 20, paddingHorizontal: 20 }, this.state.completed]} onPress={() => this._handleTabClick('completed')}><Text style={styles.headerText}>Completed</Text></TouchableOpacity>
-                    <TouchableOpacity style={[{ borderBottomWidth: 4, paddingVertical: 20, paddingHorizontal: 20 }, this.state.inProgress]} onPress={() => this._handleTabClick('inProgress')}><Text style={styles.headerText}>In Progress</Text></TouchableOpacity>
-                    <TouchableOpacity style={[{ borderBottomWidth: 4, paddingVertical: 20, paddingHorizontal: 20 }, this.state.pending]} onPress={() => this._handleTabClick('pending')}><Text style={styles.headerText}>Pending</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.headerTitle, this.state.completed]} onPress={() => this._handleTabClick('completed')}><Text style={styles.headerText}>Completed</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.headerTitle, this.state.inProgress]} onPress={() => this._handleTabClick('inProgress')}><Text style={styles.headerText}>In Progress</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.headerTitle, this.state.pending]} onPress={() => this._handleTabClick('pending')}><Text style={styles.headerText}>Pending</Text></TouchableOpacity>
                 </View>
                 {body}
                 <KeepAwake />
@@ -387,11 +437,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#07223D',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
     },
     headerText: {
         color: '#FFF',
         fontFamily: 'Montserrat-Bold',
         fontSize: 18
+    },
+    headerTitle: {
+        borderBottomWidth: 4,
+        paddingVertical: 20,
+        //paddingHorizontal: 20 
     }
 }); 
