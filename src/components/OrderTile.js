@@ -13,6 +13,8 @@ import {
 import { Icon } from 'react-native-elements';
 import { baseUrl, formatDate, getToken, processResponse, showTopNotification, token } from '../utilities';
 import RNSwipeVerify from 'react-native-swipe-verify';
+import StatusBadge from './StatusBadge'
+
 
 const { width } = Dimensions.get('window');
 
@@ -240,6 +242,7 @@ class OrderTile extends Component {
                                     justifyContent: 'center',
                                 }}>
                                 <Text style={styles.amountStyle}>₦{this.props.dataItem.cost}</Text>
+                                <StatusBadge status={this.props.dataItem.paymentStatus} />
                             </View>
                         </View>
                     </TouchableOpacity>
