@@ -43,12 +43,9 @@ export default class OtpScreen extends Component {
     })
       .then(processResponse)
       .then((res) => {
-        //   console.warn(`REQUEST==> ${JSON.stringify({phone: this.state.phone, otp: this.state.otp})}`)
-        //   console.warn(`VARIFY DATA==> ${JSON.stringify(res.data)}`)
+
         if (res.statusCode === 200 && res.data.status) {
-          (async () => {
-            await AsyncStorage.setItem('@isAuthenticated', 'true');
-          })();
+         
           this._authenticate();
         } else {
           this.setState({loading: false});
@@ -68,7 +65,7 @@ export default class OtpScreen extends Component {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({username: this.state.phone, password: 'Admin@123'}),
+      body: JSON.stringify({username: this.state.phone, password: this.state.phone}),
     })
       .then(processResponse)
       .then((res) => {
@@ -76,6 +73,7 @@ export default class OtpScreen extends Component {
         if (res.statusCode === 200) {
           (async () => {
             await AsyncStorage.setItem('@token', res.data.token);
+            await AsyncStorage.setItem('@isAuthenticated', 'true');
           })();
           this.props.navigation.navigate('AppHome');
         } else {

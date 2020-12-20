@@ -50,6 +50,9 @@ export default class DeliveriesScreen extends Component {
             fastestInterval: 120000,
             activitiesInterval: 180000,
             stopOnStillActivity: false,
+            // useSignificantChangesOnly: true,
+            // maxDaysToPersist: 1,
+            // maxRecordsToPersist: 10,
             url: 'https://airandapi.azurewebsites.net/api/location/driver/update',
             httpHeaders: {
                 'Authorization': await getToken()

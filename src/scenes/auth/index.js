@@ -35,6 +35,7 @@ export default class VerificationScreen extends Component {
     })
       .then(processResponse)
       .then((res) => {
+        console.warn(JSON.stringify(res.data))
         if (res.statusCode === 200 && res.data.status) {
           this.props.navigation.navigate('OTP', {phone: this.state.phone});
         } else if (res.statusCode === 500) {
