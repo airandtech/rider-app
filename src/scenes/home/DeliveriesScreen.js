@@ -9,6 +9,8 @@ import messaging from '@react-native-firebase/messaging';
 import KeepAwake from 'react-native-keep-awake';
 import { LocalNotification } from '../../services/LocalPushController';
 
+import NotificationService from '../../services/NotificationService';
+
 export default class DeliveriesScreen extends Component {
     constructor(props) {
         super(props);
@@ -26,6 +28,7 @@ export default class DeliveriesScreen extends Component {
             refreshing: false,
 
         };
+        this.notification = new NotificationService(this.onNotification);
     }
 
     _onRefresh = () => {
@@ -36,6 +39,7 @@ export default class DeliveriesScreen extends Component {
     }
 
     async componentDidMount() {
+        
         BackgroundGeolocation.configure({
             desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
             stationaryRadius: 50,
@@ -149,7 +153,7 @@ export default class DeliveriesScreen extends Component {
         this.createNotificationListeners();
 
         await this.getOrders();
-
+        
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
 
@@ -326,8 +330,13 @@ export default class DeliveriesScreen extends Component {
     onMessageReceivedInBackground = async (message) => {
         this.playSound();
         console.warn(JSON.stringify(`BackGround+++++++==>New Request: ${JSON.stringify(message.data)}`));
-        LocalNotification(message.data)
-        this.props.navigation.navigate('IncomingRequest', { data: message.data })
+        //LocalNotification(message.data)
+
+        this.notification.localNotification(message.data);
+
+
+       this.props.navigation.navigate('IncomingRequest', { data: message.data })
+
     }
 
     sd = () => {
